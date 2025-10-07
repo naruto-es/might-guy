@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+  elasticsearch_container:
+    build:
+      context: ./elastic-search
+    environment:
+      - ELASTIC_PASSWORD=1234
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    ports:
+      - "9199:9200"
+      - "9299:9300"
+
+  kibana_container:
+    image: docker.elastic.co/kibana/kibana:8.17.1
+    container_name: kibana_container
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch_container:9200
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN=AAEAAWVsYXN0aWMva2liYW5hL2tpYmFuYS1zZXJ2aWNlLXRva2VuOlVNVTlqVW9FUm95TTloeThST3plQ0E
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch_container
+
+  cerebro_container:
+    image: lmenezes/cerebro:latest
+    container_name: cerebro_container
+    environment:
+      - CEREBRO_PORT=9000
+    ports:
+      - "9000:9000"
+    depends_on:
+      - elasticsearch_container
+
+  mysql_container:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "3306:3306"
