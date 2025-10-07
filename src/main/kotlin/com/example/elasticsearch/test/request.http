@@ -1,0 +1,19 @@
+### goods 인덱스 데이터 추가
+POST http://localhost:8080/api/goods
+Content-Type: application/json
+
+{
+  "name": "cheolhee jung",
+  "price": 20000,
+  "description": "hello world test"
+}
+
+### goods 인덱스 데이터 추가 (비동기)
+POST http://localhost:8080/api/goods/async
+Content-Type: application/json
+
+{
+  "name": "lee yeong jae",
+  "price": 10000,
+  "description": "hello"
+}
