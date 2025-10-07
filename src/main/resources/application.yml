@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: mightguy
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+elasticsearch:
+  host: localhost
+  port: 9199
