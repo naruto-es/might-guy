@@ -17,3 +17,13 @@ Content-Type: application/json
   "price": 10000,
   "description": "hello"
 }
+
+### goods 인덱스 데이터 delete_by_query(가격 범위)로 삭제
+DELETE http://localhost:8080/api/goods
+Content-Type: application/json
+
+{
+  "minPrice": 15000,
+  "maxPrice": 20000
+}
+

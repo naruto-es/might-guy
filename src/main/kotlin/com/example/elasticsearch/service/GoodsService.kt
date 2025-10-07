@@ -3,9 +3,14 @@ package com.example.elasticsearch.service
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient
 import co.elastic.clients.elasticsearch.core.IndexRequest
 import com.example.elasticsearch.dto.CreateGoodsRequest
+import com.example.elasticsearch.dto.DeleteGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.model.GoodsDocumentId
 import com.example.elasticsearch.repository.GoodsRepository
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.data.elasticsearch.core.query.Criteria
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery
+import org.springframework.data.elasticsearch.core.query.DeleteQuery
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
@@ -13,7 +18,8 @@ import java.util.concurrent.atomic.AtomicLong
 @Service
 class GoodsService(
     private val goodsRepository: GoodsRepository,
-    private val elasticsearchAsyncClient: ElasticsearchAsyncClient
+    private val elasticsearchAsyncClient: ElasticsearchAsyncClient,
+    private val elasticsearchOperations: ElasticsearchOperations
 ) {
     private val idGenerator = AtomicLong(1)
 
@@ -54,5 +60,26 @@ class GoodsService(
         }
 
         return future
+    }
+
+    fun deleteByQuery(request: DeleteGoodsRequest): Long {
+        var criteria = Criteria()
+
+        request.name?.let { name ->
+            criteria = criteria.and(Criteria("name").matches(name))
+        }
+
+        if (request.minPrice != null && request.maxPrice != null) {
+            criteria = criteria.and(Criteria("price").between(request.minPrice, request.maxPrice))
+        } else if (request.minPrice != null) {
+            criteria = criteria.and(Criteria("price").greaterThanEqual(request.minPrice))
+        } else if (request.maxPrice != null) {
+            criteria = criteria.and(Criteria("price").lessThanEqual(request.maxPrice))
+        }
+
+        val criteriaQuery = CriteriaQuery(criteria)
+        val deleteQuery = DeleteQuery.builder(criteriaQuery).build()
+        val byQuery = elasticsearchOperations.delete(deleteQuery, GoodsDocument::class.java)
+        return byQuery.deleted
     }
 }
