@@ -27,7 +27,8 @@ Content-Type: application/json
 {
   "name": "lee yeong jae",
   "price": 10000,
-  "description": "hello"
+  "description": "hello",
+  "adminMemo": "normal user"
 }
 
 ### goods 인덱스 데이터 delete_by_query(가격 범위)로 삭제

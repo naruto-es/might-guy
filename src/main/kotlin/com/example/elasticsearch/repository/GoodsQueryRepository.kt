@@ -10,12 +10,20 @@ import org.springframework.data.elasticsearch.core.query.CriteriaQuery
 import org.springframework.data.elasticsearch.core.query.DeleteQuery
 import org.springframework.stereotype.Repository
 
-@Repository
-class GoodsQueryRepository(
-    private val elasticsearchOperations: ElasticsearchOperations
-) {
+interface GoodsQueryRepository {
+    fun deleteByQuery(request: DeleteGoodsRequest): Long
+    fun searchByQuery(searchRequest: SearchGoodsRequest): List<GoodsDocument>
+    fun boolSearchByQuery(request: BoolSearchGoodsRequest): List<GoodsDocument>
+}
 
-    fun deleteByQuery(request: DeleteGoodsRequest): Long {
+
+@Repository
+class GoodsQueryRepositoryImpl(
+    private val elasticsearchOperations: ElasticsearchOperations
+): GoodsQueryRepository {
+
+
+    override fun deleteByQuery(request: DeleteGoodsRequest): Long {
         var criteria = Criteria()
 
         request.name?.let { name ->
@@ -36,7 +44,7 @@ class GoodsQueryRepository(
         return byQuery.deleted
     }
 
-    fun searchByQuery(request: SearchGoodsRequest): List<GoodsDocument> {
+    override fun searchByQuery(request: SearchGoodsRequest): List<GoodsDocument> {
         var criteria = Criteria()
 
         request.name?.let { name ->
@@ -57,7 +65,7 @@ class GoodsQueryRepository(
             .toList()
     }
 
-    fun boolSearchByQuery(request: BoolSearchGoodsRequest): List<GoodsDocument> {
+    override fun boolSearchByQuery(request: BoolSearchGoodsRequest): List<GoodsDocument> {
         val criteriaList = mutableListOf<Criteria>()
 
         // must: 반드시 일치해야 하는 조건

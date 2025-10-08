@@ -27,5 +27,5 @@ data class GoodsDocument(
     val description: String,
 
     @field:Field(type = FieldType.Keyword, normalizer = "lowercase_normalizer")
-    val adminMemo: String,
+    val adminMemo: String = "",
 )

@@ -6,7 +6,6 @@ import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.model.GoodsDocumentId
-import com.example.elasticsearch.repository.GoodsQueryRepository
 import com.example.elasticsearch.repository.GoodsRepository
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
@@ -15,7 +14,6 @@ import java.util.concurrent.atomic.AtomicLong
 @Service
 class GoodsCommandService(
     private val goodsRepository: GoodsRepository,
-    private val goodsQueryRepository: GoodsQueryRepository,
     private val elasticsearchAsyncClient: ElasticsearchAsyncClient
 ) {
     private val idGenerator = AtomicLong(1)
@@ -62,6 +60,6 @@ class GoodsCommandService(
     }
 
     fun deleteByQuery(request: DeleteGoodsRequest): Long {
-        return goodsQueryRepository.deleteByQuery(request)
+        return goodsRepository.deleteByQuery(request)
     }
 }
