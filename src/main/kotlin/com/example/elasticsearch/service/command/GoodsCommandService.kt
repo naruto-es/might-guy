@@ -1,21 +1,19 @@
-package com.example.elasticsearch.service
+package com.example.elasticsearch.service.command
 
 import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient
 import co.elastic.clients.elasticsearch.core.IndexRequest
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
-import com.example.elasticsearch.dto.SearchGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.model.GoodsDocumentId
 import com.example.elasticsearch.repository.GoodsQueryRepository
 import com.example.elasticsearch.repository.GoodsRepository
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
 
 @Service
-class GoodsService(
+class GoodsCommandService(
     private val goodsRepository: GoodsRepository,
     private val goodsQueryRepository: GoodsQueryRepository,
     private val elasticsearchAsyncClient: ElasticsearchAsyncClient
@@ -63,14 +61,5 @@ class GoodsService(
 
     fun deleteByQuery(request: DeleteGoodsRequest): Long {
         return goodsQueryRepository.deleteByQuery(request)
-    }
-
-    fun getGoodsList(page: Int, size: Int = 10): List<GoodsDocument> {
-        val pageable = PageRequest.of(page, size)
-        return goodsRepository.findAll(pageable).content
-    }
-
-    fun getGoodsListByQuery(request: SearchGoodsRequest): List<GoodsDocument> {
-        return goodsQueryRepository.searchByQuery(request)
     }
 }
