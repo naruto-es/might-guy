@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient
 import co.elastic.clients.elasticsearch.core.IndexRequest
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
+import com.example.elasticsearch.dto.SearchGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.model.GoodsDocumentId
 import com.example.elasticsearch.repository.GoodsRepository
@@ -89,4 +90,20 @@ class GoodsService(
         return goodsRepository.findAll(pageable).content
     }
 
+    fun getGoodsListByQuery(request: SearchGoodsRequest): List<GoodsDocument> {
+        var criteria = Criteria()
+
+        request.name?.let { name ->
+            criteria = criteria.and(Criteria("name").matches(name))
+        }
+
+        request.description?.let { description ->
+            criteria = criteria.and(Criteria("description").matches(description))
+        }
+
+        val query = CriteriaQuery(criteria)
+        return elasticsearchOperations.search(query, GoodsDocument::class.java)
+            .map { it.content }
+            .toList()
+    }
 }

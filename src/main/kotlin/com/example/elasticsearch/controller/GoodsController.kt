@@ -2,6 +2,7 @@ package com.example.elasticsearch.controller
 
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
+import com.example.elasticsearch.dto.SearchGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.service.GoodsService
 import org.springframework.http.HttpStatus
@@ -33,5 +34,15 @@ class GoodsController(
         @RequestParam(value = "size", defaultValue = "10") size: Int
     ): List<GoodsDocument> {
         return goodsService.getGoodsList(page, size)
+    }
+
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    fun getGoodsByQuery(
+        @RequestParam(value = "name", required = false) name: String?,
+        @RequestParam(value = "description", required = false) description: String?
+    ): List<GoodsDocument> {
+        val request = SearchGoodsRequest(name = name, description = description)
+        return goodsService.getGoodsListByQuery(request)
     }
 }
