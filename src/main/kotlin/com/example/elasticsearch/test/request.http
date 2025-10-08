@@ -27,3 +27,8 @@ Content-Type: application/json
   "maxPrice": 20000
 }
 
+### Goods 목록 조회 (페이지 0)
+GET http://localhost:8080/api/goods?page=1&size=1
+
+### Goods 목록 조회 (페이지 1)
+GET http://localhost:8080/api/goods?page=1&size=10

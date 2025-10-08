@@ -5,12 +5,7 @@ import com.example.elasticsearch.dto.DeleteGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.service.GoodsService
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/goods")
@@ -29,5 +24,14 @@ class GoodsController(
     fun deleteGoods(@RequestBody request: DeleteGoodsRequest): Map<String, Long> {
         val deletedCount = goodsService.deleteByQuery(request)
         return mapOf("deleted" to deletedCount)
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun getGoods(
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+        @RequestParam(value = "size", defaultValue = "10") size: Int
+    ): List<GoodsDocument> {
+        return goodsService.getGoodsList(page, size)
     }
 }

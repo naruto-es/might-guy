@@ -7,6 +7,7 @@ import com.example.elasticsearch.dto.DeleteGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.model.GoodsDocumentId
 import com.example.elasticsearch.repository.GoodsRepository
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.query.Criteria
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery
@@ -82,4 +83,10 @@ class GoodsService(
         val byQuery = elasticsearchOperations.delete(deleteQuery, GoodsDocument::class.java)
         return byQuery.deleted
     }
+
+    fun getGoodsList(page: Int, size: Int = 10): List<GoodsDocument> {
+        val pageable = PageRequest.of(page, size)
+        return goodsRepository.findAll(pageable).content
+    }
+
 }
