@@ -1,5 +1,6 @@
 package com.example.elasticsearch.presentation
 
+import com.example.elasticsearch.dto.BoolSearchGoodsRequest
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
 import com.example.elasticsearch.dto.SearchGoodsRequest
@@ -47,5 +48,11 @@ class GoodsController(
     ): List<GoodsDocument> {
         val request = SearchGoodsRequest(name = name, description = description, adminMemo = adminMemo)
         return goodsQueryService.getGoodsListByQuery(request)
+    }
+
+    @PostMapping("/search/bool")
+    @ResponseStatus(HttpStatus.OK)
+    fun boolSearch(@RequestBody request: BoolSearchGoodsRequest): List<GoodsDocument> {
+        return goodsQueryService.boolSearch(request)
     }
 }

@@ -50,3 +50,44 @@ GET http://localhost:8080/api/goods/search?name=노트북
 
 ### Goods 검색 (description으로)
 GET http://localhost:8080/api/goods/search?description=게이밍
+
+### Goods Bool 검색 (must + filter)
+POST http://localhost:8080/api/goods/search/bool
+Content-Type: application/json
+
+{
+  "mustDescription": "게이밍",
+  "filterMinPrice": 100000,
+  "filterMaxPrice": 2000000
+}
+
+### Goods Bool 검색 (must + must_not)
+POST http://localhost:8080/api/goods/search/bool
+Content-Type: application/json
+
+{
+  "mustDescription": "노트북",
+  "mustNotAdminMemo": "일반고객"
+}
+
+### Goods Bool 검색 (should - OR 조건)
+POST http://localhost:8080/api/goods/search/bool
+Content-Type: application/json
+
+{
+  "shouldDescription": ["게이밍", "무선", "고성능"],
+  "minimumShouldMatch": 1
+}
+
+### Goods Bool 검색 (복합 조건)
+POST http://localhost:8080/api/goods/search/bool
+Content-Type: application/json
+
+{
+  "mustName": "노트북",
+  "mustNotAdminMemo": "블랙리스트",
+  "filterMinPrice": 1000000,
+  "filterMaxPrice": 2000000,
+  "shouldDescription": ["게이밍", "고성능"],
+  "minimumShouldMatch": 1
+}
