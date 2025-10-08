@@ -46,6 +46,10 @@ class GoodsQueryRepository(
             criteria = criteria.and(Criteria("description").matches(description))
         }
 
+        request.adminMemo?.let { adminMemo ->
+            criteria = criteria.and(Criteria("adminMemo").`is`(adminMemo))
+        }
+
         val query = CriteriaQuery(criteria)
         return elasticsearchOperations.search(query, GoodsDocument::class.java)
             .map { it.content }

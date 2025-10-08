@@ -1,7 +1,7 @@
 package com.example.elasticsearch.model
 
+import co.elastic.clients.elasticsearch._types.analysis.Normalizer
 import com.example.elasticsearch.config.constant.Analyzer
-import com.sun.tools.javac.Main
 import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
@@ -25,4 +25,7 @@ data class GoodsDocument(
 
     @field:Field(type = FieldType.Text, analyzer = Analyzer.KOREAN_ANALYZER, searchAnalyzer = Analyzer.KOREAN_ANALYZER)
     val description: String,
+
+    @field:Field(type = FieldType.Keyword, normalizer = "lowercase_normalizer")
+    val adminMemo: String,
 )

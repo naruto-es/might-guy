@@ -25,7 +25,8 @@ class GoodsCommandService(
             id = GoodsDocumentId(idGenerator.getAndIncrement()),
             name = request.name,
             price = request.price,
-            description = request.description
+            description = request.description,
+            adminMemo = request.adminMemo
         )
         return goodsRepository.save(goods)
     }
@@ -36,7 +37,8 @@ class GoodsCommandService(
             "id" to id,
             "name" to request.name,
             "price" to request.price,
-            "description" to request.description
+            "description" to request.description,
+            "adminMemo" to request.adminMemo
         )
 
         val indexRequest = IndexRequest.of<Map<String, Any>> { builder ->

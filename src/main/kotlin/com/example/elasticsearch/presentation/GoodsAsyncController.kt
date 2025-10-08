@@ -1,4 +1,4 @@
-package com.example.elasticsearch.controller
+package com.example.elasticsearch.presentation
 
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.service.command.GoodsCommandService

@@ -1,4 +1,4 @@
-package com.example.elasticsearch.controller
+package com.example.elasticsearch.presentation
 
 import com.example.elasticsearch.dto.CreateGoodsRequest
 import com.example.elasticsearch.dto.DeleteGoodsRequest
@@ -42,9 +42,10 @@ class GoodsController(
     @ResponseStatus(HttpStatus.OK)
     fun getGoodsByQuery(
         @RequestParam(value = "name", required = false) name: String?,
-        @RequestParam(value = "description", required = false) description: String?
+        @RequestParam(value = "description", required = false) description: String?,
+        @RequestParam(value = "adminMemo", required = false) adminMemo: String?
     ): List<GoodsDocument> {
-        val request = SearchGoodsRequest(name = name, description = description)
+        val request = SearchGoodsRequest(name = name, description = description, adminMemo = adminMemo)
         return goodsQueryService.getGoodsListByQuery(request)
     }
 }

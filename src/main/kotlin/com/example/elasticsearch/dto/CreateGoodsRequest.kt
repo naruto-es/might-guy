@@ -5,5 +5,6 @@ import java.math.BigDecimal
 data class CreateGoodsRequest(
     val name: String,
     val price: BigDecimal,
-    val description: String
+    val description: String,
+    val adminMemo: String
 )

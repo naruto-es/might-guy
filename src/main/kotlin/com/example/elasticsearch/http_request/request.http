@@ -5,7 +5,8 @@ Content-Type: application/json
 {
   "name": "cheolhee jung",
   "price": 20000,
-  "description": "hello world test"
+  "description": "hello world test",
+  "adminMemo": "Memo Test"
 }
 
 ### goods 인덱스 데이터 추가 (한글)
@@ -15,7 +16,8 @@ Content-Type: application/json
 {
   "name": "노트북",
   "price": 1500000,
-  "description": "고성능 게이밍 노트북"
+  "description": "고성능 게이밍 노트북",
+  "adminMemo": "Memo Test"
 }
 
 ### goods 인덱스 데이터 추가 (비동기)
