@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.query.Criteria
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery
 import org.springframework.data.elasticsearch.core.query.DeleteQuery
+import org.springframework.data.mapping.toDotPath
 import org.springframework.stereotype.Repository
 
 interface GoodsQueryRepository {
@@ -19,8 +20,8 @@ interface GoodsQueryRepository {
 
 @Repository
 class GoodsQueryRepositoryImpl(
-    private val elasticsearchOperations: ElasticsearchOperations
-): GoodsQueryRepository {
+    private val elasticsearchOperations: ElasticsearchOperations,
+) : GoodsQueryRepository {
 
 
     override fun deleteByQuery(request: DeleteGoodsRequest): Long {
@@ -31,31 +32,38 @@ class GoodsQueryRepositoryImpl(
         }
 
         if (request.minPrice != null && request.maxPrice != null) {
-            criteria = criteria.and(Criteria("price").between(request.minPrice, request.maxPrice))
+            // price 문자열 리터럴 들어가는거 지양하는게 좋아보여요.
+            criteria = criteria.and(
+                // between 함수나 gte 함수 보면 any로 타입이 지정되어있다보니, DSL만들어서 포팅해주면 편할것 같죠?
+                // 아규먼트가 nullable한 between 함수로 하나 만들면 아래 null check도 없어져서 사용하기 더 편해질거에요.
+                Criteria(GoodsDocument::price.toDotPath()).between(request.minPrice, request.maxPrice)
+            )
         } else if (request.minPrice != null) {
             criteria = criteria.and(Criteria("price").greaterThanEqual(request.minPrice))
         } else if (request.maxPrice != null) {
             criteria = criteria.and(Criteria("price").lessThanEqual(request.maxPrice))
         }
 
-        val criteriaQuery = CriteriaQuery(criteria)
-        val deleteQuery = DeleteQuery.builder(criteriaQuery).build()
-        val byQuery = elasticsearchOperations.delete(deleteQuery, GoodsDocument::class.java)
-        return byQuery.deleted
+        // 확장함수 하나 만들면 사용하는 시점에 간결해지고, 재사용성도 높아지겠네요.
+        return elasticsearchOperations.delete(criteria.toDeleteQuery(), GoodsDocument::class.java).deleted
     }
 
-    override fun searchByQuery(request: SearchGoodsRequest): List<GoodsDocument> {
+    private fun Criteria.toDeleteQuery(): DeleteQuery {
+        return DeleteQuery.builder(CriteriaQuery(this)).build()
+    }
+
+    override fun searchByQuery(searchRequest: SearchGoodsRequest): List<GoodsDocument> {
         var criteria = Criteria()
 
-        request.name?.let { name ->
+        searchRequest.name?.let { name ->
             criteria = criteria.and(Criteria("name").matches(name))
         }
 
-        request.description?.let { description ->
+        searchRequest.description?.let { description ->
             criteria = criteria.and(Criteria("description").matches(description))
         }
 
-        request.adminMemo?.let { adminMemo ->
+        searchRequest.adminMemo?.let { adminMemo ->
             criteria = criteria.and(Criteria("adminMemo").`is`(adminMemo))
         }
 
@@ -96,21 +104,19 @@ class GoodsQueryRepositoryImpl(
         }
 
         // should: 하나라도 일치하면 더 높은 점수
+        // reduce 함수 사용하면 읽는 입장에서 직관적이지 않아서, 가독성이 더 좋은 확장함수로 바꾸는게 좋아보여요.
         request.shouldDescription?.let { descriptions ->
-            if (descriptions.isNotEmpty()) {
-                val shouldCriteria = descriptions.map { desc ->
+            val shouldCriteria = or {
+                descriptions.map { desc ->
                     Criteria("description").matches(desc)
-                }.reduce { acc, c -> acc.or(c) }
-                criteriaList.add(shouldCriteria)
+                }
             }
+
+            criteriaList.add(shouldCriteria)
         }
 
         // 조건이 없으면 전체 조회
-        val finalCriteria = if (criteriaList.isEmpty()) {
-            Criteria()
-        } else {
-            criteriaList.reduce { acc, c -> acc.and(c) }
-        }
+        val finalCriteria = if (criteriaList.isEmpty()) Criteria() else criteriaList.andAll()
 
         val query = CriteriaQuery(finalCriteria)
         return elasticsearchOperations.search(query, GoodsDocument::class.java)
@@ -118,3 +124,6 @@ class GoodsQueryRepositoryImpl(
             .toList()
     }
 }
+
+private fun or(block: () -> List<Criteria>) = block().reduce { acc, c -> acc.or(c) }
+private fun Iterable<Criteria>.andAll() = this.reduce { acc, c -> acc.and(c) }
