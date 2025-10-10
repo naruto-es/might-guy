@@ -5,6 +5,7 @@ import com.example.elasticsearch.dto.SearchGoodsRequest
 import com.example.elasticsearch.model.GoodsDocument
 import com.example.elasticsearch.repository.GoodsRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,8 +13,7 @@ class GoodsQueryService(
     private val goodsRepository: GoodsRepository,
 ) {
 
-    fun getGoodsList(page: Int, size: Int = 10): List<GoodsDocument> {
-        val pageable = PageRequest.of(page, size)
+    fun getGoodsList(pageable: Pageable): List<GoodsDocument> {
         return goodsRepository.findAll(pageable).content
     }
 
